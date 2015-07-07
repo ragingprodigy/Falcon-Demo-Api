@@ -11,10 +11,17 @@ exports.index = function(req, res) {
 
 exports.show = function(req, res) {
     var sel = _.filter(judgments, { "suitno": req.query.suitno } );
-    delete sel[0].pages;
-    delete sel[0].ratios;
+    var ret = {};
 
-    res.json(sel[0]);
+    for (var property in sel[0]) {
+        if (sel[0].hasOwnProperty(property)) {
+            if (property!=='ratios'&& property!=='pages'){
+                ret[property] = sel[0][property];
+            }
+        }
+    }
+
+    res.json(ret);
 };
 
 exports.pageCount = function(req, res) {
