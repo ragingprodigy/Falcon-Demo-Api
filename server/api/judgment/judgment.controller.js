@@ -303,3 +303,8 @@ exports.deleteHighlight = function(req, res) {
         });
     });
 };
+
+// Search through the pages
+exports.search = function(req, res) {
+    res.json([3,6,12,16,23]);
+};
