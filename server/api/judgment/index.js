@@ -24,4 +24,7 @@ router.get('/bookmarks', controller.listBookmarks);
 router.post('/bookmarks', controller.newBookmark);
 router.delete('/bookmarks/:id', controller.deleteBookmark);
 
+router.post('/highlight', controller.createHighlight);
+router.delete('/highlight/:id', controller.deleteHighlight);
+
 module.exports = router;

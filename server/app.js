@@ -14,7 +14,7 @@ var app = express();
 var server = require('http').createServer(app);
 var Parse = require('parse').Parse;
 
-Parse.initialize('vPcptSTbD4vz6A0fTQPBmZxSldpP5quDXs206lWj', 'F059sZ0fLJvNZvroK9XDDiW3GyjEqgXDhrfkuIbZ');
+Parse.initialize(process.env.PARSE_APP_KEY, process.env.PARSE_JS_KEY);
 
 require('./config/express')(app);
 require('./routes')(app);

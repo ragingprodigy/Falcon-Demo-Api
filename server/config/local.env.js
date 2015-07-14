@@ -9,5 +9,7 @@ module.exports = {
   DOMAIN: 'http://localhost:9000',
   SESSION_SECRET: "primedemoapi-secret",
   // Control debug level for modules using visionmedia/debug
-  DEBUG: ''
+  DEBUG: '',
+    PARSE_APP_KEY: 'vPcptSTbD4vz6A0fTQPBmZxSldpP5quDXs206lWj',
+    PARSE_JS_KEY: 'F059sZ0fLJvNZvroK9XDDiW3GyjEqgXDhrfkuIbZ'
 };

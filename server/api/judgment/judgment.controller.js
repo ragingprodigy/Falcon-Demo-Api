@@ -6,7 +6,9 @@ var Parse = require('parse').Parse;
 var Judgment = Parse.Object.extend('Judgment'),
     Analysis = Parse.Object.extend('Analysis'),
     Page = Parse.Object.extend('Page'),
-    Bookmark = Parse.Object.extend('JudgmentBookmark');
+    MyPage = Parse.Object.extend('UserJudgmentPage'),
+    Bookmark = Parse.Object.extend('JudgmentBookmark'),
+    Highlight = Parse.Object.extend('JudgmentHighlight');
 
 // Get list of judgments
 exports.index = function(req, res) {
@@ -17,16 +19,6 @@ exports.index = function(req, res) {
 };
 
 exports.show = function(req, res) {
-    /*var sel = _.filter(judgments, { "suitno": req.query.suitno } );
-    var ret = {};
-
-    for (var property in sel[0]) {
-        if (sel[0].hasOwnProperty(property)) {
-            if (property!=='ratios'&& property!=='pages'){
-                ret[property] = sel[0][property];
-            }
-        }
-    }*/
     var query = new Parse.Query(Judgment);
     query.equalTo('suitno', req.query.suitno);
 
@@ -41,8 +33,6 @@ exports.show = function(req, res) {
 
 exports.pageCount = function(req, res) {
 
-    /*var sel = _.filter(judgments, { "suitno": req.query.suitno } );
-    res.json(sel[0].pages.length);*/
     var query = new Parse.Query(Page);
     query.equalTo('suitno', req.query.suitno);
 
@@ -53,12 +43,32 @@ exports.pageCount = function(req, res) {
 
 exports.pages = function(req, res) {
 
-    var query = new Parse.Query(Page);
+    var query = new Parse.Query(MyPage);
     query.equalTo('suitno', req.query.suitno);
-    query.ascending('pageno');
 
-    query.find().then(function(pages) {
-        res.json(pages);
+    // Find Custom Pages first
+    query.find().then(function(userPages) {
+        console.log("Found ", userPages.length, " User Pages");
+        // Find System Pages
+        var pQuery = new Parse.Query(Page);
+        pQuery.equalTo('suitno', req.query.suitno);
+        pQuery.ascending('pageno');
+
+        if (userPages.length) {
+            var userPageNos = _.map(userPages, function(r) { return r.get('pageno') } );
+
+            pQuery.notContainedIn('pageno', userPageNos);
+        }
+
+        pQuery.find().then(function(pages){
+
+            var theUnion = _.union(userPages, pages);
+            // combine User and System Pages and sort the result before sending
+            pages = _.map(theUnion, function(i){ return i.attributes; });
+            pages = _.sortBy(pages, 'pageno');
+
+            res.json(pages);
+        });
     });
 };
 
@@ -213,5 +223,83 @@ exports.deleteBookmark = function(req, res) {
         res.status(204);
     }, function(error){
         res.status(500).json(error);
+    });
+};
+
+exports.createHighlight = function(req, res) {
+    // Create the Highlight
+    function createHighlight(pageObject) {
+        var highlight = new Highlight();
+        highlight.set('page', pageObject);
+        highlight.set('comment', req.body.comment);
+
+        highlight.save().then(function(){
+            res.json(highlight);
+        });
+    }
+
+    // Create a User Copy of the Judgment Page
+    // Check if Page Has been Highlighted Before
+    var cQuery = new Parse.Query(MyPage);
+    cQuery.equalTo('suitno', req.body.suitno);
+    cQuery.equalTo('pageno', req.body.pageno);
+
+    cQuery.find().then(function(myPages){
+       if (myPages.length===1) {
+           // Do an Update
+           var myPage = myPages[0];
+           myPage.set('content', req.body.content);
+           myPage.save().then(function(){
+                // Create The Highlight Here
+               return createHighlight(myPage);
+           });
+       } else {
+           // Create a new User Page
+           var newPage = new MyPage();
+           newPage.set('content', req.body.content);
+           newPage.set('suitno', req.body.suitno);
+           newPage.set('pageno', req.body.pageno);
+
+           newPage.save().then(function(){
+               return createHighlight(newPage);
+           });
+       }
+    });
+};
+
+exports.deleteHighlight = function(req, res) {
+
+    var highlightQuery = new Parse.Query(Highlight);
+    highlightQuery.get(req.params.id).then(function(highlight){
+
+        // Find the Page it Belongs to so the page can be updated
+        var query = new Parse.Query(MyPage);
+        var page = highlight.get('page');
+
+        query.get(page.id).then(function(thePage){
+
+            // Update the Page Content
+            thePage.set('content', req.body.content);
+
+            thePage.save().then(function() {
+                // Check How many Highlights rely on this page. If there are none, delete the Page
+                highlightQuery.equalTo('page', page);
+
+                highlightQuery.count().then(function(relyingHighlights){
+                    if (relyingHighlights < 2) {
+                        // Delete the Page itself
+                        thePage.destroy().then(function(){
+                            highlight.destroy().then(function(){
+                                res.status(204).json({});
+                            });
+                        })
+                    } else {
+                        highlight.destroy().then(function(){
+                            res.status(204).json({});
+                        });
+                    }
+                });
+            });
+        });
     });
 };
