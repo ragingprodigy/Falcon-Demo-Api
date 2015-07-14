@@ -12,6 +12,10 @@ var config = require('./config/environment');
 // Setup server
 var app = express();
 var server = require('http').createServer(app);
+var Parse = require('parse').Parse;
+
+Parse.initialize('vPcptSTbD4vz6A0fTQPBmZxSldpP5quDXs206lWj', 'F059sZ0fLJvNZvroK9XDDiW3GyjEqgXDhrfkuIbZ');
+
 require('./config/express')(app);
 require('./routes')(app);
 

@@ -1,16 +1,23 @@
 'use strict';
 
-var _ = require('lodash'),
-    fs = require('fs');
-var judgments = require('./judgment.model');
+var _ = require('lodash');
+var Parse = require('parse').Parse;
+
+var Judgment = Parse.Object.extend('Judgment'),
+    Analysis = Parse.Object.extend('Analysis'),
+    Page = Parse.Object.extend('Page'),
+    Bookmark = Parse.Object.extend('JudgmentBookmark');
 
 // Get list of judgments
 exports.index = function(req, res) {
-  res.json(judgments);
+    var query = new Parse.Query(Judgment);
+    query.find().then(function(judgments){
+        res.json(judgments);
+    });
 };
 
 exports.show = function(req, res) {
-    var sel = _.filter(judgments, { "suitno": req.query.suitno } );
+    /*var sel = _.filter(judgments, { "suitno": req.query.suitno } );
     var ret = {};
 
     for (var property in sel[0]) {
@@ -19,27 +26,50 @@ exports.show = function(req, res) {
                 ret[property] = sel[0][property];
             }
         }
-    }
+    }*/
+    var query = new Parse.Query(Judgment);
+    query.equalTo('suitno', req.query.suitno);
 
-    res.json(ret);
+    query.find().then(function(judgments) {
+        if (judgments.length) {
+            res.json(judgments[0]);
+        } else {
+            res.json({});
+        }
+    });
 };
 
 exports.pageCount = function(req, res) {
 
-    var sel = _.filter(judgments, { "suitno": req.query.suitno } );
-    res.json(sel[0].pages.length);
+    /*var sel = _.filter(judgments, { "suitno": req.query.suitno } );
+    res.json(sel[0].pages.length);*/
+    var query = new Parse.Query(Page);
+    query.equalTo('suitno', req.query.suitno);
+
+    query.count().then(function(pageCount) {
+        res.json(pageCount);
+    });
 };
 
 exports.pages = function(req, res) {
 
-    var sel = _.filter(judgments, { "suitno": req.query.suitno } );
-    res.json(sel[0].pages);
+    var query = new Parse.Query(Page);
+    query.equalTo('suitno', req.query.suitno);
+    query.ascending('pageno');
+
+    query.find().then(function(pages) {
+        res.json(pages);
+    });
 };
 
 exports.ratios = function(req, res) {
 
-    var sel = _.filter(judgments, { "suitno": req.query.suitno } );
-    res.json(sel[0].ratios);
+    var query = new Parse.Query(Analysis);
+    query.equalTo('suitno', req.query.suitno);
+
+    query.find().then(function(ratios) {
+        res.json(ratios);
+    });
 };
 
 exports.statutes = function(req, res) {
@@ -153,4 +183,35 @@ exports.originatingPublications = function(req, res) {
             "id": 37
         }
     ]);
+};
+
+exports.listBookmarks = function(req, res) {
+    var query = new Parse.Query(Bookmark);
+
+    query.equalTo('suitno', req.query.suitno);
+    query.ascending('pageno');
+
+    query.find().then(function(bookmarks){
+        res.json(bookmarks);
+    });
+};
+
+exports.newBookmark = function(req, res) {
+    var bookmark = new Bookmark();
+    bookmark.save(_.pick(req.body, ['suitno','pageno'])).then(function(){
+       res.json(bookmark);
+    }, function(err){
+        res.status(500).json(err);
+    });
+};
+
+exports.deleteBookmark = function(req, res) {
+    var bookmark = new Bookmark();
+    bookmark.id = req.params.id;
+
+    bookmark.destroy().then(function(){
+        res.status(204);
+    }, function(error){
+        res.status(500).json(error);
+    });
 };

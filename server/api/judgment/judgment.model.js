@@ -461,7 +461,6 @@ module.exports = [
         ],
         "ratios": [
             {
-                "id": 873,
                 "subject_matter": "LAND LAW",
                 "issue": "Whether a photocopied land title is valid",
                 "principle": "The application shall display judgments to users in the form of a book. The judgments' contents have been split into labelled pages and these pages are to be presented to the user in sequential order. The API shall allow for either all pages of a specified suit number to be loaded or pages specified via a get parameter (to enable staged-loading, in the case where the number of pages of a case is long). per JUSTICE Kay Nnwokolo",
@@ -740,7 +739,6 @@ module.exports = [
         ],
         "ratios": [
             {
-                "id": 872,
                 "subject_matter": "LAND LAW",
                 "issue": "Whether a photocopied land title is valid",
                 "principle": "The application shall display judgments to users in the form of a book. The judgments' contents have been split into labelled pages and these pages are to be presented to the user in sequential order. The API shall allow for either all pages of a specified suit number to be loaded or pages specified via a get parameter (to enable staged-loading, in the case where the number of pages of a case is long). per JUSTICE Kay Nnwokolo",
@@ -749,7 +747,6 @@ module.exports = [
                 ]
             },
             {
-                "id": 8735,
                 "subject_matter": "EVIDENCE TAMPERING",
                 "issue": "Tampered Evidence is admissible in a Court of Law",
                 "principle": "The application shall display judgments to users in the form of a book. The judgments' contents have been split into labelled pages and these or pages specified via a get parameter (to enable staged-loading, in the case where the number of pages of a case is long). per JUSTICE Kay Nnwokolo",
@@ -758,7 +755,6 @@ module.exports = [
                 ]
             },
             {
-                "id": 3873,
                 "subject_matter": "LAND LAW",
                 "issue": "Whether a photocopied land title is valid",
                 "principle": "The application shall display judgments to users in the form of a book. The judgments' contents have been split into labelled pages and these pages are to be presented to the user in sequential order. The API shall allow for either all pages of a specified suit number to be loaded or pages specified via a get parameter (to enable staged-loading, in the case where the number of pages of a case is long). per JUSTICE Kay Nnwokolo",
@@ -767,7 +763,6 @@ module.exports = [
                 ]
             },
             {
-                "id": 8973,
                 "subject_matter": "EVIDENCE TAMPERING",
                 "issue": "Tampered Evidence is admissible in a Court of Law",
                 "principle": "The application shall display judgments to users in the form of a book. The judgments' contents have been split into labelled pages and these or pages specified via a get parameter (to enable staged-loading, in the case where the number of pages of a case is long). per JUSTICE Kay Nnwokolo",

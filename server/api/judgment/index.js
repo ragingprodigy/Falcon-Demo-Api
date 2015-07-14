@@ -20,4 +20,8 @@ router.get('/statutes', controller.statutes);
 router.get('/publicationsReliedOn', controller.publicationsReliedOn);
 router.get('/originatingPublications', controller.originatingPublications);
 
+router.get('/bookmarks', controller.listBookmarks);
+router.post('/bookmarks', controller.newBookmark);
+router.delete('/bookmarks/:id', controller.deleteBookmark);
+
 module.exports = router;
